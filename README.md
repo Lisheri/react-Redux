@@ -1,70 +1,33 @@
-# Getting Started with Create React App
+# Redux三大核心
+## 单一数据源
+整个应用的state被存储在一颗object tree中, 并且这个 object tree 只存在于唯一一个store中
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## state是只读的
+唯一改变 **state** 的方法就是要触发action。 这个 **action** 是一个用于描述已发生事件的普通对象,类似于 vuex 的 mutation
 
-## Available Scripts
+## 使用纯函数执行修改
+为了描述 action 如何改变 state tree, 需要编写一个reducers
++ Reducers 只是一些纯函数(输入参数, 返回一个对象的函数), 它接收先前的 state 和 action, 并且返回新的 state, 可以复用、 可以控制顺序、 传入附加参数
 
-In the project directory, you can run:
+## 只要 store.dispatch(action), 就会触发绑定的reducer
 
-### `yarn start`
+# react-redux
+## Provider
++ Provider **包裹** 在根组件最外层, 使所有的子组件都可以拿到 State
++ Provider 接收 **store** 作为 **props**, 然后通过 context 往下传递, 这样 react 中任何组件都可以通过 context 获取到store
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## connect
++ Provider 内部组件如果想要使用到 state 中的数据, 就必须要 connect 进行一层包裹封装, 换一句话来说就是必须要被 connect 进行加强
++ connect 就是方便我们组件能够获取到 store 中的 state
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### connect(...)(Component)
+#### connect函数第一次执行内部有四个参数, 返回的也是函数, 再一次执行传入需要加强(获取顶级数据store)的组件
+#### 参数
++ mapStateToProps(state, ownProps) 这个函数允许我们将store中的数据作为props绑定到组件上 
+    - state: redux 中的 store 
+    - ownProps: 自己的store
++ mapDispatchToProps(dispatch, ownProps) 将action作为props绑定到我们自己的函数中
+    - dispatch 就是 store.dispatch
+    - ownProps 自己的props
++ mergeProps(stateProps, dispatchProps, ownProps) 不管是 stateProps 还是 dispatchProps, 都需要和 ownProps merge之后才会被赋值给组件。通常情况下可以不传这个参数, connect 就会使用Object.assign替代该方法
++ options 定制connector行为
